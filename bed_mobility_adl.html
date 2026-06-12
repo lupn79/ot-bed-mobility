@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>床上移位與 ADL — 影片教學與互動練習</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue: #1A6FAF;
+  --blue-light: #E3F0FA;
+  --blue-mid: #6AAED6;
+  --blue-dark: #0C3F6B;
+  --blue-deep: #154F8A;
+  --orange: #D4621A;
+  --orange-light: #FDF0E8;
+  --orange-mid: #F0A06A;
+  --orange-dark: #7A3210;
+  --gray-bg: #F5F6F7;
+  --gray-border: #DFE1E6;
+  --gray-text: #6B6F7A;
+  --text: #1A1D26;
+  --white: #FFFFFF;
+  --red-light: #FCEAEA;
+  --red-mid: #F0A0A0;
+  --red-dark: #7A1F1F;
+  --red: #B03030;
+  --amber-light: #FDF4E3;
+  --amber-mid: #F0C070;
+  --amber-dark: #5C3A08;
+  --amber: #8A5A10;
+  --green-light: #E8F5EE;
+  --green-mid: #80C99A;
+  --green-dark: #1A4F2E;
+  --green: #2A7A48;
+  --purple-light: #F0EEFA;
+  --purple-mid: #B0A0E0;
+  --purple-dark: #3A2878;
+  --purple: #5A40A8;
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif; background: var(--gray-bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+/* Header */
+.site-header { background: var(--blue-dark); padding: 16px 24px; position: sticky; top: 0; z-index: 100; }
+.header-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
+.header-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.header-text h1 { font-size: 17px; font-weight: 600; color: #fff; line-height: 1.3; }
+.header-text p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+/* Nav */
+.main-nav { background: var(--white); border-bottom: 1px solid var(--gray-border); padding: 0 24px; overflow-x: auto; }
+.nav-inner { max-width: 860px; margin: 0 auto; display: flex; gap: 0; white-space: nowrap; }
+.nav-btn { padding: 14px 18px; border: none; background: none; font-size: 14px; color: var(--gray-text); cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s; font-weight: 500; }
+.nav-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+.nav-btn:hover:not(.active) { color: var(--text); }
+
+/* Main */
+.main-content { max-width: 860px; margin: 0 auto; padding: 24px 24px 60px; }
+.section-panel { display: none; }
+.section-panel.active { display: block; }
+.card { background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 16px; }
+.section-intro { font-size: 14px; color: var(--gray-text); margin-bottom: 20px; padding: 13px 17px; background: var(--blue-light); border-radius: var(--radius-sm); border-left: 3px solid var(--blue); line-height: 1.7; }
+
+/* Video */
+.video-wrap { position: relative; padding-bottom: 56.25%; height: 0; border-radius: var(--radius); overflow: hidden; background: #000; margin-bottom: 14px; }
+.video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+.video-note { font-size: 13px; color: var(--gray-text); margin-bottom: 16px; padding: 12px 16px; background: var(--blue-light); border-radius: var(--radius-sm); border-left: 3px solid var(--blue); }
+.start-quiz-btn { width: 100%; padding: 14px; border-radius: var(--radius-sm); border: none; background: var(--blue); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: background .15s; }
+.start-quiz-btn:hover { background: var(--blue-dark); }
+.action-btns { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.action-btn { flex: 1; min-width: 140px; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--gray-border); background: var(--white); font-size: 13px; color: var(--text); cursor: pointer; font-weight: 500; transition: background .15s; }
+.action-btn:hover { background: var(--gray-bg); }
+
+/* Quiz */
+.progress-bar-bg { height: 4px; background: var(--gray-border); border-radius: 2px; margin-bottom: 18px; }
+.progress-bar-fill { height: 4px; background: var(--blue); border-radius: 2px; transition: width .4s ease; }
+.q-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.q-num { font-size: 13px; color: var(--gray-text); }
+.q-badge { font-size: 12px; padding: 3px 10px; border-radius: 20px; background: var(--blue-light); color: var(--blue-dark); font-weight: 500; }
+.q-text { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.q-scenario { background: var(--gray-bg); border-left: 3px solid var(--blue); padding: 12px 16px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 14px; color: #444; line-height: 1.7; margin-bottom: 18px; }
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+@media (max-width: 480px) { .options-grid { grid-template-columns: 1fr; } }
+.opt-btn { background: var(--white); border: 1px solid var(--gray-border); border-radius: var(--radius-sm); padding: 13px 15px; text-align: left; cursor: pointer; transition: border-color .15s, background .15s; }
+.opt-btn:hover:not(:disabled) { background: var(--gray-bg); border-color: #B0B4C0; }
+.opt-btn .ol { font-size: 14px; font-weight: 600; color: var(--text); }
+.opt-btn .od { font-size: 12px; color: var(--gray-text); margin-top: 2px; display: none; }
+.opt-btn.correct { border: 1.5px solid var(--green-mid); background: var(--green-light); }
+.opt-btn.correct .ol { color: var(--green-dark); }
+.opt-btn.wrong { border: 1.5px solid var(--red-mid); background: var(--red-light); }
+.opt-btn.wrong .ol { color: var(--red-dark); }
+.opt-btn.reveal { border: 1.5px solid var(--green-mid); background: var(--green-light); }
+.opt-btn.reveal .ol { color: var(--green-dark); }
+.opt-btn:disabled { cursor: default; }
+.feedback { border-radius: var(--radius-sm); padding: 13px 16px; margin-bottom: 14px; font-size: 14px; line-height: 1.65; display: none; }
+.feedback.correct { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-mid); }
+.feedback.wrong { background: var(--red-light); color: var(--red-dark); border: 1px solid var(--red-mid); }
+.feedback .fb-title { font-weight: 600; margin-bottom: 4px; }
+.quiz-next-btn { width: 100%; padding: 13px; border-radius: var(--radius-sm); border: 1px solid var(--gray-border); background: var(--white); font-size: 15px; color: var(--text); cursor: pointer; font-weight: 500; display: none; transition: background .15s; }
+.quiz-next-btn:hover { background: var(--gray-bg); }
+.score-screen { display: none; text-align: center; padding: 2rem 0; }
+.score-big { font-size: 56px; font-weight: 700; color: var(--blue); line-height: 1; margin-bottom: 8px; }
+.score-label { font-size: 15px; color: var(--gray-text); margin-bottom: 1.5rem; }
+.score-breakdown { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; max-width: 340px; margin: 0 auto 1.5rem; }
+.sc-card { background: var(--gray-bg); border-radius: var(--radius-sm); padding: 14px 10px; }
+.sc-num { font-size: 24px; font-weight: 700; color: var(--text); }
+.sc-lbl { font-size: 12px; color: var(--gray-text); margin-top: 2px; }
+.restart-btn { padding: 12px 28px; border-radius: var(--radius-sm); border: 1px solid var(--gray-border); background: var(--white); font-size: 15px; color: var(--text); cursor: pointer; font-weight: 500; }
+
+/* Steps */
+.steps-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.step-tab { padding: 7px 14px; border-radius: var(--radius-sm); border: 1px solid var(--gray-border); background: var(--white); font-size: 13px; color: var(--gray-text); cursor: pointer; font-weight: 500; transition: all .15s; }
+.step-tab.active { background: var(--blue-light); color: var(--blue-dark); border-color: var(--blue-mid); }
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+.step-title { font-size: 18px; font-weight: 700; color: var(--blue-dark); margin-bottom: 6px; }
+.step-subtitle { font-size: 13px; color: var(--gray-text); margin-bottom: 16px; }
+.step-list { list-style: none; counter-reset: steps; }
+.step-item { counter-increment: steps; display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-border); cursor: pointer; transition: background .15s; border-radius: var(--radius-sm); padding-left: 4px; }
+.step-item:last-child { border-bottom: none; }
+.step-item:hover { background: var(--gray-bg); }
+.step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.step-content .step-main { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.5; }
+.step-content .step-tip { font-size: 13px; color: var(--orange); margin-top: 4px; font-weight: 500; display: none; }
+.step-item.active .step-tip { display: block; }
+.step-item.active .step-num { background: var(--orange); }
+.warning-box { background: var(--orange-light); border: 1px solid var(--orange-mid); border-radius: var(--radius-sm); padding: 12px 16px; margin-top: 12px; font-size: 13px; color: var(--orange-dark); font-weight: 500; }
+
+/* Scoring */
+.scoring-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.score-card { border-radius: var(--radius-sm); padding: 14px 16px; border: 1px solid; cursor: pointer; transition: transform .15s; }
+.score-card:hover { transform: translateY(-2px); }
+.score-card.ind { background: var(--green-light); border-color: var(--green-mid); }
+.score-card.ind .sc-grade { color: var(--green-dark); }
+.score-card.sup { background: var(--blue-light); border-color: var(--blue-mid); }
+.score-card.sup .sc-grade { color: var(--blue-dark); }
+.score-card.min { background: var(--amber-light); border-color: var(--amber-mid); }
+.score-card.min .sc-grade { color: var(--amber-dark); }
+.score-card.mod { background: var(--orange-light); border-color: var(--orange-mid); }
+.score-card.mod .sc-grade { color: var(--orange-dark); }
+.score-card.max { background: var(--red-light); border-color: var(--red-mid); }
+.score-card.max .sc-grade { color: var(--red-dark); }
+.score-card.dep { background: #F5F0FA; border-color: var(--purple-mid); }
+.score-card.dep .sc-grade { color: var(--purple-dark); }
+.sc-grade { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.sc-name { font-size: 12px; color: var(--gray-text); margin-bottom: 6px; }
+.sc-pct { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.sc-desc { font-size: 12px; line-height: 1.5; }
+.score-detail { background: var(--gray-bg); border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 12px; display: none; }
+.score-detail.show { display: block; }
+.sd-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.sd-body { font-size: 13px; color: #444; line-height: 1.7; }
+
+/* Footer */
+.site-footer { text-align: center; padding: 24px; font-size: 12px; color: var(--gray-text); border-top: 1px solid var(--gray-border); margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-icon">🛏️</div>
+    <div class="header-text">
+      <h1>床上移位與 ADL — 影片教學與互動練習</h1>
+      <p>北醫復健醫學部職能治療 · 供 OT 學生與新進治療師使用</p>
+    </div>
+  </div>
+</header>
+
+<nav class="main-nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="switchMain('video',this)">影片教學</button>
+    <button class="nav-btn" onclick="switchMain('quiz',this)">計分判斷練習</button>
+    <button class="nav-btn" onclick="switchMain('steps',this)">操作步驟導覽</button>
+    <button class="nav-btn" onclick="switchMain('ref',this)">評分標準速查</button>
+  </div>
+</nav>
+
+<main class="main-content">
+
+  <!-- VIDEO -->
+  <section class="section-panel active" id="panel-video">
+    <p class="video-note">📹 請先完整觀看影片，了解床上移位與 ADL 的操作方式，再進行後續的互動練習。</p>
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/2j0_nW5vVNM" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+    </div>
+    <div class="card" style="text-align:center; padding:20px;">
+      <div style="font-size:15px; color:var(--gray-text); margin-bottom:14px;">影片看完了嗎？選擇接下來的練習：</div>
+      <button class="start-quiz-btn" onclick="switchMain('quiz',null)">開始計分判斷練習 →</button>
+      <div class="action-btns">
+        <button class="action-btn" onclick="switchMain('steps',null)">📋 操作步驟導覽</button>
+        <button class="action-btn" onclick="switchMain('ref',null)">📊 評分標準速查</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="section-panel" id="panel-quiz">
+    <p class="section-intro">每題提供臨床情境，請根據 Bed mobility 評分標準或 Barthel Index 作答。答題後立即顯示解說。</p>
+    <div class="card" id="nameCard" style="text-align:center; padding:24px;">
+      <div style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:6px;">請先輸入您的姓名</div>
+      <div style="font-size:13px; color:var(--gray-text); margin-bottom:16px;">完成練習後，成績會自動送出給老師</div>
+      <input id="studentName" type="text" placeholder="請輸入您的姓名" style="width:100%; max-width:280px; padding:10px 14px; border:1px solid var(--gray-border); border-radius:var(--radius-sm); font-size:15px; margin-bottom:14px; display:block; margin-left:auto; margin-right:auto;">
+      <button onclick="startQuiz()" style="padding:12px 32px; border-radius:var(--radius-sm); border:none; background:var(--blue); color:#fff; font-size:15px; font-weight:600; cursor:pointer;">開始練習</button>
+    </div>
+    <div class="card" id="quizCard" style="display:none;">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="qProgress" style="width:0%"></div></div>
+      <div class="q-meta">
+        <span class="q-num" id="qNum">題目 1 / 10</span>
+        <span class="q-badge" id="qBadge"></span>
+      </div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-scenario" id="qScenario"></div>
+      <div class="options-grid" id="qOptions"></div>
+      <div class="feedback" id="qFeedback"><div class="fb-title" id="qFbTitle"></div><div id="qFbBody"></div></div>
+      <button class="quiz-next-btn" id="qNextBtn">下一題</button>
+    </div>
+    <div class="score-screen" id="scoreScreen">
+      <div class="score-big" id="scoreBig"></div>
+      <div class="score-label" id="scoreLabel"></div>
+      <div style="font-size:14px;color:var(--gray-text);margin-bottom:12px;" id="scoreNameLabel"></div>
+      <div class="score-breakdown">
+        <div class="sc-card"><div class="sc-num" id="scCorrect"></div><div class="sc-lbl">答對</div></div>
+        <div class="sc-card"><div class="sc-num" id="scWrong"></div><div class="sc-lbl">答錯</div></div>
+        <div class="sc-card"><div class="sc-num" id="scTotal"></div><div class="sc-lbl">總題數</div></div>
+      </div>
+      <div id="submitStatus" style="font-size:13px;margin-bottom:12px;color:var(--green);"></div>
+      <button class="restart-btn" onclick="restartQuiz()">重新練習</button>
+    </div>
+  </section>
+
+  <!-- STEPS -->
+  <section class="section-panel" id="panel-steps">
+    <p class="section-intro">點選各步驟可查看操作要點與注意事項。每個動作的關鍵提醒以橘色標示。</p>
+    <div class="card">
+      <div class="steps-tabs">
+        <button class="step-tab active" onclick="switchStep('rolling',this)">Rolling</button>
+        <button class="step-tab" onclick="switchStep('sittingup',this)">Sitting up</button>
+        <button class="step-tab" onclick="switchStep('shifting',this)">Shifting</button>
+        <button class="step-tab" onclick="switchStep('s2s',this)">Sit to Stand</button>
+        <button class="step-tab" onclick="switchStep('stand2sit',this)">Stand to Sit</button>
+        <button class="step-tab" onclick="switchStep('transfer',this)">Transfer</button>
+        <button class="step-tab" onclick="switchStep('dressing',this)">Dressing</button>
+        <button class="step-tab" onclick="switchStep('stairs',this)">Stairs</button>
+      </div>
+
+      <div class="step-panel active" id="step-rolling">
+        <div class="step-title">Rolling — 翻身</div>
+        <div class="step-subtitle">偏癱病患翻向健側的標準流程</div>
+        <ul class="step-list">
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">1</div><div class="step-content"><div class="step-main">雙手交叉（健側手抓住患側手），保持手肘伸直與身體成垂直</div><div class="step-tip">患側手容易滑落，確認健側手緊握患側手腕</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">2</div><div class="step-content"><div class="step-main">將雙腳彎曲並合攏，或將健側腳置於患側腳下方</div><div class="step-tip">健側腳在下可輔助帶動患側腳一起轉動</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">3</div><div class="step-content"><div class="step-main">以健側手帶動患側手甩向健側邊，身體和雙腳隨著轉動，依序轉向健側邊</div><div class="step-tip">利用上肢擺動的慣性帶動軀幹旋轉，動作需流暢連貫</div></div></li>
+        </ul>
+      </div>
+
+      <div class="step-panel" id="step-sittingup">
+        <div class="step-title">Sitting up — 坐起</div>
+        <div class="step-subtitle">從側臥姿坐起的標準流程</div>
+        <ul class="step-list">
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">1</div><div class="step-content"><div class="step-main">先將身體翻向健側邊（參考 Rolling 步驟）</div><div class="step-tip">翻身後確認側臥姿勢穩定再進行下一步</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">2</div><div class="step-content"><div class="step-main">以健側腳將患側腳移到床緣下</div><div class="step-tip">雙腳垂放床緣有助於重心轉移，使坐起更省力</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">3</div><div class="step-content"><div class="step-main">以健側手將上半身慢慢撐起，直到坐正</div><div class="step-tip">若病患力量不足，可扶其肩膀和骨盆助其撐起上半身</div></div></li>
+        </ul>
+      </div>
+
+      <div class="step-panel" id="step-shifting">
+        <div class="step-title">Shifting — 坐姿側移</div>
+        <div class="step-subtitle">坐姿下的側方移動</div>
+        <ul class="step-list">
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">1</div><div class="step-content"><div class="step-main">健側手/腳先往健側移動</div><div class="step-tip">先移動健側建立新的支撐點</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">2</div><div class="step-content"><div class="step-main">健側手支撐於床且腳踩地，把臀抬高往健側移動</div><div class="step-tip">臀部需完全抬離床面再移動，避免摩擦傷皮膚</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">3</div><div class="step-content"><div class="step-main">再用健側手協助患側腳移動</div><div class="step-tip">患側腳移動完成後確認坐姿平衡再放開支撐</div></div></li>
+        </ul>
+        <div class="warning-box">⚠️ 先訓練往健側移位，往患側移位會有跌倒風險</div>
+      </div>
+
+      <div class="step-panel" id="step-s2s">
+        <div class="step-title">Sit to Stand — 坐站</div>
+        <div class="step-subtitle">從坐姿站起的標準流程</div>
+        <ul class="step-list">
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">1</div><div class="step-content"><div class="step-main">雙手交扣，軀幹前傾彎到頭部下巴超過膝前及腳趾</div><div class="step-tip">前傾幅度要夠大，重心才能移到腳上，站起才省力</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">2</div><div class="step-content"><div class="step-main">將臀部抬離床面</div><div class="step-tip">若需協助，可站在患側，拉住褲頭並給予向前向上的力</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">3</div><div class="step-content"><div class="step-main">臀部漸高，膝蓋漸伸直</div><div class="step-tip">膝蓋伸直與臀部抬高需同步進行，避免卡在半蹲姿</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">4</div><div class="step-content"><div class="step-main">直到膝蓋接近伸直時，再將軀幹和腰部挺直</div><div class="step-tip">最後才挺腰，避免過早挺腰造成重心後移跌倒</div></div></li>
+        </ul>
+      </div>
+
+      <div class="step-panel" id="step-stand2sit">
+        <div class="step-title">Stand to Sit — 站坐</div>
+        <div class="step-subtitle">從站姿坐下的標準流程</div>
+        <ul class="step-list">
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">1</div><div class="step-content"><div class="step-main">軀幹和腰部先向前傾彎至下巴超過膝蓋及腳趾</div><div class="step-tip">前傾是關鍵，可控制重心避免跌坐</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">2</div><div class="step-content"><div class="step-main">臀部慢慢下降，膝蓋漸彎</div><div class="step-tip">提醒病患動作盡可能的緩慢，避免跌坐至椅面</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">3</div><div class="step-content"><div class="step-main">直到臀部降至座椅後，軀幹再坐正起來</div><div class="step-tip">確認臀部完全接觸座椅後再放鬆前傾姿勢</div></div></li>
+        </ul>
+      </div>
+
+      <div class="step-panel" id="step-transfer">
+        <div class="step-title">Transfer — 床輪椅轉位</div>
+        <div class="step-subtitle">床到輪椅的標準流程（病患可部分協助）</div>
+        <ul class="step-list">
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">1</div><div class="step-content"><div class="step-main">輪椅擺在病患健側，與床沿約 45 度角，煞車鎖上，腳踏板移開</div><div class="step-tip">45 度角讓轉身距離最短，降低跌倒風險</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">2</div><div class="step-content"><div class="step-main">照護者站在病患患側，給予適當協助（抓褲頭、扶患側手）</div><div class="step-tip">站患側是為了在病患往患側跌倒時能及時保護</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">3</div><div class="step-content"><div class="step-main">病患以健側手撐著對側輪椅扶手，軀幹前彎慢慢站起，慢慢轉身坐進輪椅</div><div class="step-tip">提醒病患不要急，轉身時視線往目標座椅看</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">4</div><div class="step-content"><div class="step-main">病患以健側腳協助患側腳抬高後放在腳踏板上</div><div class="step-tip">確認坐姿穩定後再放上腳踏板</div></div></li>
+        </ul>
+      </div>
+
+      <div class="step-panel" id="step-dressing">
+        <div class="step-title">Dressing — 穿衣</div>
+        <div class="step-subtitle">偏癱病患穿衣口訣：患側先穿、健側先脫</div>
+        <ul class="step-list">
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">1</div><div class="step-content"><div class="step-main">【套頭式】衣服放膝蓋，領口朝上，將患側袖子捲起</div><div class="step-tip">袖子捲起讓手更容易穿入，避免卡住</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">2</div><div class="step-content"><div class="step-main">健側手帶患側手穿入患側袖內，拉至手肘上</div><div class="step-tip">患側先穿是關鍵口訣！因患側活動度差，先穿才有空間</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">3</div><div class="step-content"><div class="step-main">穿入健側手</div><div class="step-tip">健側手功能好，最後穿最容易</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">4</div><div class="step-content"><div class="step-main">健側手抓衣服下擺，以健側手將衣服穿過頭，整理衣服</div><div class="step-tip">套頭時身體可稍微前傾讓領口更容易過頭</div></div></li>
+        </ul>
+        <div class="warning-box">🗝️ 口訣：患側先穿後脫（穿衣患側先，脫衣健側先）</div>
+      </div>
+
+      <div class="step-panel" id="step-stairs">
+        <div class="step-title">Stairs — 樓梯</div>
+        <div class="step-subtitle">口訣：上樓好腳先，下樓壞腳先</div>
+        <ul class="step-list">
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">↑</div><div class="step-content"><div class="step-main">【上樓】健側手握欄杆 → 健側腳先上 → 患側腳跟上同階</div><div class="step-tip">使用拐杖上樓：拐杖 → 健側腳 → 患側腳</div></div></li>
+          <li class="step-item" onclick="toggleStep(this)"><div class="step-num">↓</div><div class="step-content"><div class="step-main">【下樓】健側手握欄杆 → 患側腳先下 → 健側腳跟下同階</div><div class="step-tip">使用拐杖下樓：拐杖 → 患側腳 → 健側腳</div></div></li>
+        </ul>
+        <div class="warning-box">🗝️ 上樓：好腳先（健側腳先上）｜下樓：壞腳先（患側腳先下）</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFERENCE -->
+  <section class="section-panel" id="panel-ref">
+    <div class="card">
+      <h2 style="font-size:16px;font-weight:600;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--gray-border);">Bed Mobility 評分標準</h2>
+      <p style="font-size:13px;color:var(--gray-text);margin-bottom:14px;">點選各評分卡片查看詳細說明</p>
+      <div class="scoring-grid">
+        <div class="score-card ind" onclick="showScoreDetail('ind')">
+          <div class="sc-grade">Independent</div>
+          <div class="sc-name">獨立</div>
+          <div class="sc-pct">100%</div>
+          <div class="sc-desc">全程自行完成</div>
+        </div>
+        <div class="score-card sup" onclick="showScoreDetail('sup')">
+          <div class="sc-grade">Supervision</div>
+          <div class="sc-name">監督</div>
+          <div class="sc-pct">—</div>
+          <div class="sc-desc">在他人監督下可自行完成</div>
+        </div>
+        <div class="score-card min" onclick="showScoreDetail('min')">
+          <div class="sc-grade">Minimal Assistance</div>
+          <div class="sc-name">最小協助</div>
+          <div class="sc-pct">&gt;75%</div>
+          <div class="sc-desc">自行完成部分超過 75%</div>
+        </div>
+        <div class="score-card mod" onclick="showScoreDetail('mod')">
+          <div class="sc-grade">Moderate Assistance</div>
+          <div class="sc-name">中度協助</div>
+          <div class="sc-pct">25–75%</div>
+          <div class="sc-desc">自行完成部分介於 25%-75%</div>
+        </div>
+        <div class="score-card max" onclick="showScoreDetail('max')">
+          <div class="sc-grade">Maximal Assistance</div>
+          <div class="sc-name">最大協助</div>
+          <div class="sc-pct">&lt;25%</div>
+          <div class="sc-desc">自行完成部分不到 25%</div>
+        </div>
+        <div class="score-card dep" onclick="showScoreDetail('dep')">
+          <div class="sc-grade">Dependent</div>
+          <div class="sc-name">完全依賴</div>
+          <div class="sc-pct">0%</div>
+          <div class="sc-desc">完全依賴他人完成</div>
+        </div>
+      </div>
+      <div class="score-detail" id="scoreDetail"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:16px;font-weight:600;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--gray-border);">Barthel Index — 巴氏量表重點項目</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead><tr style="background:var(--gray-bg);">
+          <th style="text-align:left;padding:9px 12px;color:var(--gray-text);font-weight:600;border-bottom:1px solid var(--gray-border);">項目</th>
+          <th style="text-align:left;padding:9px 12px;color:var(--gray-text);font-weight:600;border-bottom:1px solid var(--gray-border);">獨立的關鍵條件</th>
+          <th style="text-align:left;padding:9px 12px;color:var(--gray-text);font-weight:600;border-bottom:1px solid var(--gray-border);">常見注意點</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);font-weight:500;">Feeding</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">不論是否使用患側，可自行進食</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">他人備餐不影響評分，備餐後能自行吃 = Independent</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);font-weight:500;">Transfer</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">能自行在床與輪椅間轉位</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">輪椅放健側 45 度，照護者站患側保護</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);font-weight:500;">Grooming</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">不論是否使用患側，可自行梳洗</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">他人備用具不影響評分，備好後能自行使用 = Independent</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);font-weight:500;">Mobility</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">能使用助行器步行 50 公尺</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">單側損傷用 Quadricane 放健側；雙側損傷用 Walker 放前方</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);font-weight:500;">Stairs</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">能上下一段樓梯</td><td style="padding:9px 12px;border-bottom:1px solid var(--gray-border);">上樓健側先，下樓患側先；使用拐杖時拐杖最先</td></tr>
+          <tr><td style="padding:9px 12px;font-weight:500;">Dressing</td><td style="padding:9px 12px;">能自行穿脫衣褲鞋襪</td><td style="padding:9px 12px;">患側先穿後脫；套頭式與前開式步驟不同</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">北醫復健醫學部職能治療 · 本工具僅供學習使用</footer>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLSgVXgZ4jcWkbjnHqLX46wcMYHxaOQ_kV4Oi0V9a72gGab2OZ1sLgE8pu6fn8tcN53Q/exec';
+let studentName = '';
+
+// ── NAV ──
+function switchMain(id, btn) {
+  document.querySelectorAll('.section-panel').forEach(e => e.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  else {
+    const map = {video:0, quiz:1, steps:2, ref:3};
+    document.querySelectorAll('.nav-btn')[map[id]]?.classList.add('active');
+  }
+}
+
+// ── STEPS ──
+function switchStep(id, btn) {
+  document.querySelectorAll('.step-panel').forEach(e => e.classList.remove('active'));
+  document.querySelectorAll('.step-tab').forEach(e => e.classList.remove('active'));
+  document.getElementById('step-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function toggleStep(el) {
+  el.classList.toggle('active');
+}
+
+// ── SCORING DETAIL ──
+const scoreDetails = {
+  ind: { title: 'Independent — 獨立', body: '病患全程自行完成動作，不需要他人提供任何協助、監督或口頭指示。\n\n例如：病患能自行翻身、坐起、站立，完全不需治療師在旁。' },
+  sup: { title: 'Supervision — 監督', body: '病患能自行完成動作，但需要他人在旁監督以確保安全，治療師未提供任何肢體協助。\n\n例如：病患能自行 Shifting，但因有跌倒風險，需治療師在旁監督。' },
+  min: { title: 'Minimal Assistance — 最小協助', body: '病患自行完成超過 75% 的動作，只需他人給予少量肢體協助（不到 25%）。\n\n例如：Sit to stand 大部分能自行完成，只在最後挺腰時需輕扶。' },
+  mod: { title: 'Moderate Assistance — 中度協助', body: '病患自行完成 25%-75% 的動作，需要他人給予中等程度的協助。\n\n例如：Sitting up 能自行翻身和移腳，但撐起上半身時需他人協助約一半力量。' },
+  max: { title: 'Maximal Assistance — 最大協助', body: '病患自行完成不到 25% 的動作，大部分需依靠他人完成。\n\n例如：病患幾乎無法自行完成 Rolling，只能做出微小的嘗試動作。' },
+  dep: { title: 'Dependent — 完全依賴', body: '病患完全無法貢獻任何動作，完全依靠他人完成。\n\n注意：Dependent 和 Maximal assistance 的差別在於病患是否有任何主動參與（哪怕不到 25%）。' }
+};
+function showScoreDetail(key) {
+  const d = scoreDetails[key];
+  const el = document.getElementById('scoreDetail');
+  el.innerHTML = '<div class="sd-title">' + d.title + '</div><div class="sd-body">' + d.body.replace(/\n/g,'<br>') + '</div>';
+  el.className = 'score-detail show';
+}
+
+// ── QUIZ ──
+const questions = [
+  { cat:'Bed Mobility 評分', text:'Rolling 動作評分', scenario:'中風病患嘗試自行翻身。病患能雙手交叉、雙腳彎曲合攏，並靠自己的力量完整翻向健側，全程不需他人協助或監督。', opts:['Dependent','Maximal assistance','Supervision','Independent'], ans:3, fc:'答對！病患全程自行完成 Rolling，不需任何協助或監督，評為 Independent。', fw:'答案是 Independent。全程自行完成動作，不需他人協助或監督，就給 Independent。' },
+  { cat:'Bed Mobility 評分', text:'Sitting up 動作評分', scenario:'病患嘗試從躺姿坐起。病患能自行翻向健側、把腳移到床緣，但撐起上半身時只完成了約 40% 的動作，其餘需治療師從肩膀和骨盆協助完成。', opts:['Dependent','Maximal assistance','Moderate assistance','Minimal assistance'], ans:2, fc:'答對！病患自行完成約 40%（介於 25%-75%），評為 Moderate assistance。', fw:'答案是 Moderate assistance。自行完成部分介於 25%-75% 就給 Moderate assistance。Maximal 是完成不到 25%，Minimal 是完成超過 75%。' },
+  { cat:'Bed Mobility 評分', text:'Shifting 動作評分', scenario:'病患在治療師在旁監督下，能自行完成坐姿下的側移：健側手腳先移動、把臀抬高往健側移動、再協助患側腳移動。全程沒有跌倒風險，治療師未出手協助。', opts:['Independent','Supervision','Minimal assistance','Moderate assistance'], ans:1, fc:'答對！病患能自行完成，但需要他人在旁監督，評為 Supervision。', fw:'答案是 Supervision。病患能自行完成動作，但需要他人在旁監督才安全，就給 Supervision。Independent 是完全不需監督。' },
+  { cat:'Bed Mobility 評分', text:'Sit to Stand 動作評分', scenario:'病患嘗試從坐姿站起。雙手交扣前傾、臀部抬離床面都能自行完成，但膝蓋打直和軀幹挺直的部分需治療師給予協助，病患自行完成約 80%。', opts:['Supervision','Minimal assistance','Moderate assistance','Maximal assistance'], ans:1, fc:'答對！病患自行完成超過 75%，評為 Minimal assistance。', fw:'答案是 Minimal assistance。自行完成部分超過 75% 就給 Minimal assistance。' },
+  { cat:'Bed Mobility 評分', text:'Stand to Sit 動作評分', scenario:'病患完全無法控制軀幹前傾的動作，也無法控制臀部下降的速度，整個 Stand to sit 的過程完全依賴治療師協助完成。', opts:['Maximal assistance','Moderate assistance','Supervision','Dependent'], ans:3, fc:'答對！病患完全無法自行完成任何部分，完全依賴他人，評為 Dependent。', fw:'答案是 Dependent。完全依賴他人完成，自己沒有貢獻任何動作，就給 Dependent。Maximal assistance 是病患仍有完成不到 25%。' },
+  { cat:'Barthel Index — Transfer', text:'Transfer 評分', scenario:'病患能在治療師站在患側給予少量協助下（抓褲頭、扶患側手），自行以健側手撐著輪椅扶手站起、轉身坐進輪椅。病患自行完成了大部分動作。', opts:['完全依賴','需大量協助','需少量協助或監督','完全獨立'], ans:2, fc:'答對！病患需要少量協助才能完成 Transfer，評為需少量協助或監督。', fw:'答案是需少量協助或監督。病患能完成大部分動作但需少量協助，不是完全獨立，也不是需大量協助。' },
+  { cat:'Barthel Index — Dressing', text:'穿套頭式衣服評分', scenario:'病患能依正確順序：患側手先穿袖子→拉至手肘→穿健側手→健側手抓下擺穿過頭→整理衣服，全程自行完成，不需他人協助或提醒。', opts:['完全依賴','需協助但能完成一半以上','需少量協助','完全獨立'], ans:3, fc:'答對！病患能依正確順序全程自行完成穿衣，評為完全獨立。', fw:'答案是完全獨立。病患能依正確步驟全程自行完成，不需任何協助，就給完全獨立。' },
+  { cat:'Barthel Index — Mobility', text:'助行器選擇與擺放', scenario:'病患為右側偏癱（右側為患側），需要使用助行器行走。請問應優先選擇哪種助行器，且應放置於哪一側？', opts:['Walker，放前方','Quadricane，放患側（右側）','Quadricane，放健側（左側）','Walker，放健側（左側）'], ans:2, fc:'答對！單側患肢損傷使用 Quadricane，且放置於健側邊，行走順序為：Quadricane → 患側腳 → 健側腳。', fw:'答案是 Quadricane 放健側。Walker 適用雙側患肢；單側患肢用 Quadricane，放健側，行走順序：Quadricane → 患側腳 → 健側腳。' },
+  { cat:'Barthel Index — Stairs', text:'上樓梯步驟', scenario:'病患為左側偏癱（左側為患側），要使用欄杆上樓梯。治療師應指導病患用哪隻手握欄杆，以及哪隻腳先上？', opts:['左手握欄杆，左腳（患側腳）先上','右手握欄杆，左腳（患側腳）先上','右手握欄杆，右腳（健側腳）先上','左手握欄杆，右腳（健側腳）先上'], ans:2, fc:'答對！健側手（右手）握欄杆，健側腳（右腳）先上，再將患側腳跟上至同階。口訣：上樓好腳先。', fw:'答案是右手握欄杆，右腳（健側腳）先上。上樓梯口訣：健側手握欄杆，健側腳先上（好腳先上），再將患側腳跟上同階。' },
+  { cat:'Barthel Index — Stairs', text:'下樓梯步驟（使用拐杖）', scenario:'同一位左側偏癱病患要下樓梯，並使用拐杖。正確的下樓順序是什麼？', opts:['健側腳 → 患側腳 → 拐杖','拐杖 → 健側腳 → 患側腳','患側腳 → 健側腳 → 拐杖','拐杖 → 患側腳 → 健側腳'], ans:3, fc:'答對！使用拐杖下樓的正確順序是：拐杖 → 患側腳 → 健側腳。口訣：下樓壞腳先。', fw:'答案是拐杖 → 患側腳 → 健側腳。下樓口訣：患側腳先下（壞腳先下），使用拐杖時拐杖最先，再患側腳，最後健側腳。' }
+];
+
+let shuffled = [], qIdx = 0, score = 0, answered = false;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function startQuiz() {
+  const name = document.getElementById('studentName').value.trim();
+  if (!name) { alert('請先輸入您的姓名！'); return; }
+  studentName = name;
+  document.getElementById('nameCard').style.display = 'none';
+  document.getElementById('quizCard').style.display = 'block';
+  shuffled = shuffle(questions);
+  qIdx = 0; score = 0;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (qIdx >= shuffled.length) { showScore(); return; }
+  const q = shuffled[qIdx];
+  answered = false;
+  document.getElementById('qProgress').style.width = (qIdx/shuffled.length*100) + '%';
+  document.getElementById('qNum').textContent = '題目 ' + (qIdx+1) + ' / ' + shuffled.length;
+  document.getElementById('qBadge').textContent = q.cat;
+  document.getElementById('qText').textContent = q.text;
+  document.getElementById('qScenario').textContent = q.scenario;
+  const grid = document.getElementById('qOptions');
+  grid.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt-btn';
+    b.innerHTML = '<div class="ol">' + o + '</div>';
+    b.onclick = () => selectAnswer(i, q);
+    grid.appendChild(b);
+  });
+  const fb = document.getElementById('qFeedback');
+  fb.style.display = 'none'; fb.className = 'feedback';
+  document.getElementById('qNextBtn').style.display = 'none';
+}
+
+function selectAnswer(chosen, q) {
+  if (answered) return;
+  answered = true;
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.disabled = true);
+  const ok = chosen === q.ans;
+  if (ok) { score++; btns[chosen].className = 'opt-btn correct'; }
+  else { btns[chosen].className = 'opt-btn wrong'; btns[q.ans].className = 'opt-btn reveal'; }
+  const fb = document.getElementById('qFeedback');
+  fb.style.display = 'block';
+  fb.className = 'feedback ' + (ok ? 'correct' : 'wrong');
+  document.getElementById('qFbTitle').textContent = ok ? '答對了！' : '答錯了';
+  document.getElementById('qFbBody').textContent = ok ? q.fc : q.fw;
+  const nb = document.getElementById('qNextBtn');
+  nb.style.display = 'block';
+  nb.textContent = qIdx < shuffled.length-1 ? '下一題' : '查看成績';
+}
+
+document.getElementById('qNextBtn').onclick = () => { qIdx++; renderQuestion(); };
+
+function showScore() {
+  document.getElementById('quizCard').style.display = 'none';
+  const ss = document.getElementById('scoreScreen');
+  ss.style.display = 'block';
+  const pct = Math.round(score/shuffled.length*100);
+  document.getElementById('scoreBig').textContent = pct + '%';
+  document.getElementById('scoreLabel').textContent = pct===100?'全部答對，臨床判斷力優秀！':pct>=80?'表現很好，再複習幾個情境吧。':pct>=60?'有進步空間，建議重複練習。':'建議重新複習評分標準後再練習。';
+  document.getElementById('scoreNameLabel').textContent = studentName + ' 的成績';
+  document.getElementById('scCorrect').textContent = score;
+  document.getElementById('scWrong').textContent = shuffled.length - score;
+  document.getElementById('scTotal').textContent = shuffled.length;
+  submitScore(studentName, pct, score, shuffled.length-score, shuffled.length);
+}
+
+function submitScore(name, pct, correct, wrong, total) {
+  const status = document.getElementById('submitStatus');
+  status.textContent = '成績送出中...';
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, score: pct, correct, wrong, total })
+  }).then(() => {
+    status.textContent = '✓ 成績已送出給老師';
+    status.style.color = 'var(--green)';
+  }).catch(() => {
+    status.textContent = '⚠ 成績送出失敗，請告知老師';
+    status.style.color = 'var(--red)';
+  });
+}
+
+function restartQuiz() {
+  qIdx = 0; score = 0; studentName = '';
+  document.getElementById('studentName').value = '';
+  document.getElementById('nameCard').style.display = 'block';
+  document.getElementById('quizCard').style.display = 'none';
+  document.getElementById('scoreScreen').style.display = 'none';
+}
+
+shuffled = shuffle(questions);
+</script>
+</body>
+</html>
